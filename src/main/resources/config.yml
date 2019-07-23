@@ -1,0 +1,15 @@
+General:
+  AutosaveDelay: 300
+  PriceUpdateDelay: 10
+
+Signs:
+  BuyLineBefore: "[Buy]"
+  BuyLineAfter: "&1[Buy]"
+  SellLineBefore: "[Sell]"
+  SellLineAfter: "&1[Sell]"
+
+Prices:
+  COAL:
+    Buy: 6.00
+    Sell: 3.00
+    Change: 0.01

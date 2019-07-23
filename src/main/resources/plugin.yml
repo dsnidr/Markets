@@ -1,0 +1,10 @@
+name: Markets
+version: ${project.version}
+main: com.dmastech.markets.Markets
+api-version: 1.13
+depend: [Vault, ActionBarAPI]
+authors: [sniddunc]
+website: dmastech.com
+commands:
+  markets:
+    description: Command displaying market info

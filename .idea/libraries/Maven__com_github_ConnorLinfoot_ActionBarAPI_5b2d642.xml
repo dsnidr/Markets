@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.github.ConnorLinfoot:ActionBarAPI:5b2d642">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/ConnorLinfoot/ActionBarAPI/5b2d642/ActionBarAPI-5b2d642.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/ConnorLinfoot/ActionBarAPI/5b2d642/ActionBarAPI-5b2d642-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/ConnorLinfoot/ActionBarAPI/5b2d642/ActionBarAPI-5b2d642-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
