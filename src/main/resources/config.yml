@@ -14,6 +14,18 @@ Signs:
 
 Prices:
   COAL:
-    Buy: 6.00
-    Sell: 3.00
-    Change: 0.01
+    Buy: 6.0
+    Sell: 3.0
+    Change: 0.12
+  IRON_INGOT:
+    Buy: 20.0
+    Sell: 10.0
+    Change: 0.4
+  GOLD_INGOT:
+    Buy: 100.0
+    Sell: 50.0
+    Change: 2.0
+  DIAMOND:
+    Buy: 1000.0
+    Sell: 500.0
+    Change: 20.0

@@ -75,18 +75,6 @@ public class SignHelper {
         return "$" + new DecimalFormat("0.00").format(unformatted);
     }
 
-    public static void updateSellPrice(Sign sign, double oldPrice, double changeAmount, int amount, String type) {
-        double newPrice = oldPrice - changeAmount * amount;
-        double minPrice = (ConfigManager.sellPrices.get(type) / 4) * amount;
-
-        if (newPrice < minPrice) {
-            newPrice = minPrice;
-        }
-
-        sign.setLine(3, SignHelper.formatPrice(newPrice));
-        sign.update();
-    }
-
     public static String translateItemType(String input) {
         return input.replace(" ", "_").toUpperCase();
     }

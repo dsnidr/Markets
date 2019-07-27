@@ -2,10 +2,14 @@ package com.dmastech.markets.managers;
 
 import com.dmastech.markets.Markets;
 import com.dmastech.markets.Utils;
+import com.dmastech.markets.enums.SignType;
+import com.dmastech.markets.objects.MarketItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,6 +82,136 @@ public class ConfigManager {
             DataManager.loadMarketItems();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static File getConfigFile() {
+        return new File(Markets.getInstance().getDataFolder(), "config.yml");
+    }
+
+    public static void saveConfig(FileConfiguration config) {
+        try {
+            config.save(getConfigFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setBuyPrice(Material type, double price) {
+        buyPrices.put(type.toString(), price);
+
+        FileConfiguration config = Markets.getInstance().getConfig();
+
+        config.set("Prices." + type.toString() + ".Buy", price);
+
+        if (!materials.contains(type)) {
+            materials.add(type.toString());
+        }
+
+        if (!DataManager.marketItemExists(type)) {
+            double defaultSell = price / 2;
+            double defaultChange = price * 0.02;
+
+            config.set("Prices." + type.toString() + ".Sell", defaultSell);
+            config.set("Prices." + type.toString() + ".Change", defaultChange);
+
+            saveConfig(config);
+
+            sellPrices.put(type.toString(), defaultSell);
+            change.put(type.toString(), defaultChange);
+
+            DataManager.setBuyPrice(type, price);
+            DataManager.setSellPrice(type, defaultSell);
+
+            DataManager.registerMarketItem(type);
+        }
+
+        else {
+            MarketItem marketItem = DataManager.getMarketItem(type);
+
+            marketItem.setBuyPrice(price);
+            marketItem.setBaseBuyPrice(price);
+            marketItem.updateSigns(SignType.BUY);
+
+            saveConfig(config);
+        }
+    }
+
+    public static void setSellPrice(Material type, double price) {
+        sellPrices.put(type.toString(), price);
+
+        FileConfiguration config = Markets.getInstance().getConfig();
+
+        config.set("Prices." + type.toString() + ".Sell", price);
+
+        if (!materials.contains(type)) {
+            materials.add(type.toString());
+        }
+
+        if (!DataManager.marketItemExists(type)) {
+            double defaultBuy = price * 2;
+            double defaultChange = defaultBuy * 0.02;
+
+            config.set("Prices." + type.toString() + ".Buy", defaultBuy);
+            config.set("Prices." + type.toString() + ".Change", defaultChange);
+
+            saveConfig(config);
+
+            buyPrices.put(type.toString(), defaultBuy);
+            change.put(type.toString(), defaultChange);
+
+            DataManager.setSellPrice(type, price);
+            DataManager.setBuyPrice(type, defaultBuy);
+
+            DataManager.registerMarketItem(type);
+        }
+
+        else {
+            MarketItem marketItem = DataManager.getMarketItem(type);
+
+            marketItem.setSellPrice(price);
+            marketItem.setBaseSellPrice(price);
+            marketItem.updateSigns(SignType.SELL);
+
+            saveConfig(config);
+        }
+    }
+
+    public static void setChangeAmount(Material type, double amount) {
+        change.put(type.toString(), amount);
+
+        FileConfiguration config = Markets.getInstance().getConfig();
+
+        config.set("Prices." + type.toString() + ".Change", amount);
+
+        if (!materials.contains(type)) {
+            materials.add(type.toString());
+        }
+
+        if (!DataManager.marketItemExists(type)) {
+            double defaultBuy = amount / 0.02;
+            double defaultSell = defaultBuy / 2;
+
+            config.set("Prices." + type.toString() + ".Buy", defaultBuy);
+            config.set("Prices." + type.toString() + ".Sell", defaultSell);
+
+            saveConfig(config);
+
+            buyPrices.put(type.toString(), defaultBuy);
+            sellPrices.put(type.toString(), defaultSell);
+
+            DataManager.setSellPrice(type, defaultBuy);
+            DataManager.setBuyPrice(type, defaultSell);
+
+            DataManager.registerMarketItem(type);
+        }
+
+        else {
+            MarketItem marketItem = DataManager.getMarketItem(type);
+
+            marketItem.setPriceChange(amount);
+
+            saveConfig(config);
         }
     }
 }

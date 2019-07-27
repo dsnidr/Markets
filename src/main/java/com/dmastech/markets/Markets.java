@@ -1,6 +1,7 @@
 package com.dmastech.markets;
 
 import com.dmastech.markets.commands.MarketsCommand;
+import com.dmastech.markets.commands.MarketsCommandCompleter;
 import com.dmastech.markets.listeners.SignListener;
 import com.dmastech.markets.managers.ConfigManager;
 import com.dmastech.markets.managers.DataManager;
@@ -111,6 +112,7 @@ public final class Markets extends JavaPlugin {
     private boolean commands() {
         try {
             this.getCommand("markets").setExecutor(new MarketsCommand());
+            this.getCommand("markets").setTabCompleter(new MarketsCommandCompleter());
         } catch (Exception e) {
             console.sendMessage(ChatColor.RED + "Failed to register commands!");
             e.printStackTrace();

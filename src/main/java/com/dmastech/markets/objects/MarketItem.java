@@ -49,12 +49,24 @@ public class MarketItem {
         return baseBuyPrice;
     }
 
+    public void setBaseBuyPrice(double baseBuyPrice) {
+        this.baseBuyPrice = baseBuyPrice;
+    }
+
     public double getBaseSellPrice() {
         return baseSellPrice;
     }
 
+    public void setBaseSellPrice(double baseSellPrice) {
+        this.baseSellPrice = baseSellPrice;
+    }
+
     public double getPriceChange() {
         return change;
+    }
+
+    public void setPriceChange(double change) {
+        this.change = change;
     }
 
     public void setBuyPrice(double price) {

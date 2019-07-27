@@ -170,6 +170,14 @@ public class DataManager {
         return items.values();
     }
 
+    public static boolean marketItemExists(Material material) {
+        return items.containsKey(material);
+    }
+
+    public static void registerMarketItem(Material material) {
+        items.put(material, new MarketItem(material));
+    }
+
     public static void load() throws IOException {
         File file = new File(Markets.getInstance().getDataFolder(), "data.yml");
 
