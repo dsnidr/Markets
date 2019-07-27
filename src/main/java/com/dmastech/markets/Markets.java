@@ -15,6 +15,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.io.IOException;
 
 public final class Markets extends JavaPlugin {
@@ -100,6 +101,7 @@ public final class Markets extends JavaPlugin {
             DataManager.load();
         } catch (Exception e) {
             console.sendMessage(ChatColor.RED + "Failed to setup files!");
+            e.printStackTrace();
             return false;
         }
 
@@ -111,6 +113,7 @@ public final class Markets extends JavaPlugin {
             this.getCommand("markets").setExecutor(new MarketsCommand());
         } catch (Exception e) {
             console.sendMessage(ChatColor.RED + "Failed to register commands!");
+            e.printStackTrace();
             return false;
         }
 
@@ -122,6 +125,7 @@ public final class Markets extends JavaPlugin {
             this.getServer().getPluginManager().registerEvents(new SignListener(), this);
         } catch (Exception e) {
             console.sendMessage(ChatColor.RED + "Failed to implement listeners!");
+            e.printStackTrace();
             return false;
         }
 
@@ -140,6 +144,7 @@ public final class Markets extends JavaPlugin {
             put.setTask(Bukkit.getScheduler().runTaskTimer(this, put, priceUpdateTime, priceUpdateTime));
         } catch (Exception e) {
             console.sendMessage(ChatColor.RED + "Failed to fire initial tasks!");
+            e.printStackTrace();
             return false;
         }
 

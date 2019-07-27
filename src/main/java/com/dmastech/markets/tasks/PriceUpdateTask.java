@@ -1,9 +1,11 @@
 package com.dmastech.markets.tasks;
 
 import com.dmastech.markets.Utils;
+import com.dmastech.markets.enums.SignType;
 import com.dmastech.markets.helpers.SignHelper;
 import com.dmastech.markets.managers.ConfigManager;
 import com.dmastech.markets.managers.DataManager;
+import com.dmastech.markets.objects.MarketItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
@@ -22,32 +24,29 @@ public class PriceUpdateTask implements Runnable {
 
     @Override
     public void run() {
-        for (String locString : DataManager.getSellSigns()) {
-            Location signLoc = Utils.getLocationFromString(locString);
+        for (MarketItem marketItem : DataManager.getMarketItems()) {
+            if (marketItem.getBuyPrice() < marketItem.getBaseBuyPrice()) {
+                double basePrice = marketItem.getBaseBuyPrice();
+                double newPrice = marketItem.getBuyPrice() + marketItem.getPriceChange();
 
-            if (!signLoc.getBlock().getType().toString().contains("SIGN")) {
-                continue;
-            }
-
-            Sign sign = (Sign) signLoc.getBlock().getState();
-            String[] lines = sign.getLines();
-
-            int amount = SignHelper.getAmount(lines);
-            double price = SignHelper.getPrice(lines);
-            String type = SignHelper.getMaterial(lines).toString();
-
-            double basePrice = ConfigManager.sellPrices.get(type) * amount;
-            double changeAmount = ConfigManager.change.get(type);
-
-            if (price < basePrice) {
-                price += changeAmount * amount;
-
-                if (price > basePrice) {
-                    price = basePrice;
+                if (newPrice > basePrice) {
+                    newPrice = basePrice;
                 }
 
-                sign.setLine(3, SignHelper.formatPrice(price));
-                sign.update();
+                marketItem.setBuyPrice(newPrice);
+                marketItem.updateSigns(SignType.BUY);
+            }
+
+            if (marketItem.getSellPrice() < marketItem.getBaseSellPrice()) {
+                double basePrice = marketItem.getBaseSellPrice();
+                double newPrice = marketItem.getSellPrice() + marketItem.getPriceChange();
+
+                if (newPrice > basePrice) {
+                    newPrice = basePrice;
+                }
+
+                marketItem.setSellPrice(newPrice);
+                marketItem.updateSigns(SignType.SELL);
             }
         }
     }

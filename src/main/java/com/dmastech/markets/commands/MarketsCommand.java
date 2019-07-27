@@ -3,6 +3,8 @@ package com.dmastech.markets.commands;
 import com.dmastech.markets.Markets;
 import com.dmastech.markets.managers.ConfigManager;
 import com.dmastech.markets.managers.DataManager;
+import com.dmastech.markets.objects.MarketItem;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,10 +27,28 @@ public class MarketsCommand implements CommandExecutor {
         }
 
         else if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-            if (!Markets.getPermissions().has(player, "markets.reload") && !player.isOp()) return true;
-            ConfigManager.init();
+            if (!Markets.getPermissions().has(player, "markets.reload") && !player.isOp()) {
+                player.sendMessage(ChatColor.RED + "You lack the required permissions to execute this command");
+                return true;
+            }
+
+            ConfigManager.reload();
 
             player.sendMessage(ChatColor.GREEN + "Markets has been reloaded");
+        }
+
+        else if (args.length == 1 && args[0].equalsIgnoreCase("reset")) {
+            if (!Markets.getPermissions().has(player, "markets.reset") && !player.isOp()) {
+                player.sendMessage(ChatColor.RED + "You lack the required permissions to execute this command");
+                return true;
+            }
+
+            for (MarketItem item : DataManager.getMarketItems()) {
+                item.setSellPrice(item.getBaseSellPrice());
+                item.setBuyPrice(item.getBaseBuyPrice());
+
+                item.updateSigns();
+            }
         }
 
         return false;

@@ -3,9 +3,11 @@ package com.dmastech.markets.listeners;
 import com.connorlinfoot.actionbarapi.ActionBarAPI;
 import com.dmastech.markets.Markets;
 import com.dmastech.markets.Utils;
+import com.dmastech.markets.enums.SignType;
 import com.dmastech.markets.helpers.SignHelper;
 import com.dmastech.markets.managers.ConfigManager;
 import com.dmastech.markets.managers.DataManager;
+import com.dmastech.markets.objects.MarketItem;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
@@ -41,12 +43,14 @@ public class SignListener implements Listener {
 
             if (!valid) return;
 
+            MarketItem marketItem = DataManager.getMarketItem(Material.getMaterial(formattedItemName));
+
             int amount = SignHelper.getAmount(lines);
 
             event.setLine(0, Utils.getColourizedString(ConfigManager.Signs.BuyLineAfter));
-            event.setLine(3, SignHelper.formatPrice(ConfigManager.buyPrices.get(formattedItemName) * amount));
+            event.setLine(3, SignHelper.formatPrice(marketItem.getBuyPrice() * amount));
 
-            DataManager.registerBuySign(event.getBlock().getLocation());
+            DataManager.registerBuySign(event.getBlock().getLocation(), SignHelper.getMaterial(lines));
         }
 
         // Creating a sell sign
@@ -57,12 +61,14 @@ public class SignListener implements Listener {
 
             if (!valid) return;
 
+            MarketItem marketItem = DataManager.getMarketItem(Material.getMaterial(formattedItemName));
+
             int amount = SignHelper.getAmount(lines);
 
             event.setLine(0, Utils.getColourizedString(ConfigManager.Signs.SellLineAfter));
-            event.setLine(3, SignHelper.formatPrice(ConfigManager.sellPrices.get(formattedItemName) * amount));
+            event.setLine(3, SignHelper.formatPrice(marketItem.getSellPrice() * amount));
 
-            DataManager.registerSellSign(event.getBlock().getLocation());
+            DataManager.registerSellSign(event.getBlock().getLocation(), SignHelper.getMaterial(lines));
         }
     }
 
@@ -79,14 +85,14 @@ public class SignListener implements Listener {
         if (lines[0].equalsIgnoreCase(Utils.getColourizedString(ConfigManager.Signs.BuyLineAfter))) {
             if (!Markets.getPermissions().has(player, "markets.buy.delete") && !player.isOp()) return;
 
-            DataManager.unregisterBuySign(sign.getLocation());
+            DataManager.unregisterBuySign(sign.getLocation(), SignHelper.getMaterial(lines));
         }
 
         // Deleting a sell sign
         else if (lines[0].equalsIgnoreCase(Utils.getColourizedString(ConfigManager.Signs.SellLineAfter))) {
             if (!Markets.getPermissions().has(player, "markets.sell.delete") && !player.isOp()) return;
 
-            DataManager.unregisterSellSign(sign.getLocation());
+            DataManager.unregisterSellSign(sign.getLocation(), SignHelper.getMaterial(lines));
         }
     }
 
@@ -107,16 +113,17 @@ public class SignListener implements Listener {
             Economy economy = Markets.getEconomy();
 
             int amount = SignHelper.getAmount(lines);
-            double price = SignHelper.getPrice(lines);
             Material mat = SignHelper.getMaterial(lines);
 
-            if (!economy.has(player, price)) {
+            MarketItem marketItem = DataManager.getMarketItem(mat);
+
+            if (!economy.has(player, marketItem.getBuyPrice())) {
                 player.sendMessage(ChatColor.RED + "You can't afford this!");
 
                 return;
             }
 
-            EconomyResponse response = economy.withdrawPlayer(player, price);
+            EconomyResponse response = economy.withdrawPlayer(player, marketItem.getBuyPrice());
 
             if (!response.transactionSuccess()) {
                 player.sendMessage(ChatColor.DARK_RED + "Something went wrong...");
@@ -130,6 +137,10 @@ public class SignListener implements Listener {
             player.getInventory().addItem(item);
 
             ActionBarAPI.sendActionBar(player, ChatColor.GREEN + "" + ChatColor.BOLD + "You bought " + amount + " " + lines[2] + " for " + lines[3]);
+
+            marketItem.handleChange(amount, SignType.BUY);
+            marketItem.handleChange(amount, SignType.SELL);
+            marketItem.updateSigns();
         }
 
         // Using a sell sign
@@ -139,8 +150,9 @@ public class SignListener implements Listener {
             Economy economy = Markets.getEconomy();
 
             int amount = SignHelper.getAmount(lines);
-            double price = SignHelper.getPrice(lines);
             Material mat = SignHelper.getMaterial(lines);
+
+            MarketItem marketItem = DataManager.getMarketItem(mat);
 
             ItemStack item = new ItemStack(mat, amount);
 
@@ -150,7 +162,7 @@ public class SignListener implements Listener {
                 return;
             }
 
-            EconomyResponse response = economy.depositPlayer(player, price);
+            EconomyResponse response = economy.depositPlayer(player, marketItem.getSellPrice());
 
             if (!response.transactionSuccess()) {
                 player.sendMessage(ChatColor.DARK_RED + "Something went wrong...");
@@ -163,7 +175,9 @@ public class SignListener implements Listener {
 
             ActionBarAPI.sendActionBar(player, ChatColor.GREEN + "" + ChatColor.BOLD + "You sold " + amount + " " + lines[2] + " for " + lines[3]);
 
-            SignHelper.updateSellPrice(sign, price, ConfigManager.change.get(mat.toString()), amount, mat.toString());
+            marketItem.handleChange(amount, SignType.SELL);
+            marketItem.handleChange(amount, SignType.BUY);
+            marketItem.updateSigns();
         }
     }
 }
