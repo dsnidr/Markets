@@ -123,7 +123,7 @@ public class SignListener implements Listener {
                 return;
             }
 
-            EconomyResponse response = economy.withdrawPlayer(player, marketItem.getBuyPrice());
+            EconomyResponse response = economy.withdrawPlayer(player, marketItem.getBuyPrice() * amount);
 
             if (!response.transactionSuccess()) {
                 player.sendMessage(ChatColor.DARK_RED + "Something went wrong...");
@@ -162,7 +162,7 @@ public class SignListener implements Listener {
                 return;
             }
 
-            EconomyResponse response = economy.depositPlayer(player, marketItem.getSellPrice());
+            EconomyResponse response = economy.depositPlayer(player, marketItem.getSellPrice() * amount);
 
             if (!response.transactionSuccess()) {
                 player.sendMessage(ChatColor.DARK_RED + "Something went wrong...");
